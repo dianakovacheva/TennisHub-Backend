@@ -50,8 +50,8 @@ const userSchema = new Schema({
     },
   },
   membershipStatus: String,
-  userRole: String, // or manager
-  isClubManager: false, // for managers
+  userRole: String,
+  isClubManager: false,
   userCreatedClubsList: [
     {
       type: [Types.ObjectId],

@@ -5,7 +5,7 @@ const IMAGE_URL_PATTERN =
 
 const TennisClubSchema = new Schema(
   {
-    tennisClubApiId: {
+    tennisClubId: {
       type: String,
       trim: true,
     },
