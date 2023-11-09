@@ -5,8 +5,8 @@ const { auth } = require("../utils");
 
 router.get("/profile", auth(), authController.getProfileInfo);
 router.put("/profile", auth(), authController.editProfileInfo);
-router.get("/recipes", auth(), authController.getUserRecipesList);
+router.get("/clubs", auth(), authController.getUserTennisClubsList);
 router.get("/comments", auth(), authController.getUserCommentsList);
-router.get("/saved-recipes", auth(), authController.getUserSavedRecipesList);
+router.get("/booked-courts", auth(), authController.getUserBookedCourtsList);
 
 module.exports = router;
