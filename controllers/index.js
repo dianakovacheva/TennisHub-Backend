@@ -1,9 +1,15 @@
 const authController = require("./authController");
-const tennisClubController = require("./tennisClubController");
-const commentController = require("./commentController");
+const userController = require("./userController");
+const clubController = require("./clubController");
+const commentController = require("./commentsController");
+const courtController = require("./courtController");
+const bookingController = require("./bookingController");
 
 module.exports = {
   authController,
-  tennisClubController,
+  userController,
+  clubController,
   commentController,
+  courtController,
+  bookingController,
 };
