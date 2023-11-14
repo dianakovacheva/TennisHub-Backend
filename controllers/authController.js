@@ -1,4 +1,4 @@
-const { User, tokenBlacklistModel, Comment } = require("../models");
+const { User, tokenBlacklistModel } = require("../models");
 
 const utils = require("../utils");
 const { authCookieName } = require("../app-config");
@@ -12,7 +12,7 @@ const removePassword = (data) => {
 };
 
 const register = (req, res, next) => {
-  const { firstName, lastName, email, password, repeatPassword } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   return User.create({ firstName, lastName, email, password })
     .then((createdUser) => {
@@ -90,71 +90,8 @@ function logout(req, res) {
     .catch((err) => res.send(err));
 }
 
-function getProfileInfo(req, res, next) {
-  const { _id: userId } = req.user;
-
-  User.findOne({ _id: userId }, { password: 0, __v: 0 })
-    .then((user) => {
-      res.status(200).send(bsonToJson(user));
-    })
-    .catch((err) => res.send(err));
-}
-
-function editProfileInfo(req, res, next) {
-  const { _id: userId } = req.user;
-  const { firstName, lastName, email } = req.body;
-
-  User.findOneAndUpdate(
-    { _id: userId },
-    { firstName, lastName, email },
-    { runValidators: true, new: true }
-  )
-    .then((udpatedProfileInfo) => {
-      res.status(200).json(bsonToJson(udpatedProfileInfo));
-    })
-    .catch((err) => res.send(err));
-}
-
-function getUserTennisClubsList(req, res, next) {
-  const { _id: userId } = req.user;
-
-  User.findById({ _id: userId }, { password: 0, __v: 0 })
-    .populate("userTennisClubsList")
-    .then((foundUser) => {
-      res.status(200).json(foundUser.userTennisClubsList);
-    })
-    .catch((err) => res.send(err));
-}
-
-function getUserBookedCourtsList(req, res, next) {
-  const { _id: userId } = req.user;
-
-  User.findById({ _id: userId }, { password: 0, __v: 0 })
-    .populate("userBookedCourtsList")
-    .then((foundUser) => {
-      res.status(200).json(foundUser.userBookedCourtsList);
-    })
-    .catch((err) => res.send(err));
-}
-
-function getUserCommentsList(req, res, next) {
-  const { _id: userId } = req.user;
-
-  Comment.find({ commentAuthor: userId })
-    .populate({ path: "commentTennisClub", select: "title" })
-    .then((foundComments) => {
-      res.status(200).json(foundComments);
-    })
-    .catch((err) => res.send(err));
-}
-
 module.exports = {
   login,
   register,
   logout,
-  getProfileInfo,
-  editProfileInfo,
-  getUserTennisClubsList,
-  getUserBookedCourtsList,
-  getUserCommentsList,
 };
