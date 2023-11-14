@@ -1,11 +1,15 @@
 const tokenBlacklistModel = require("./tokenBlacklistModel");
 const User = require("./userModel");
-const TennisClub = require("./tennisClubModel");
+const Club = require("./clubModel");
+const Court = require("./courtModel");
+const Booking = require("./bookingModel");
 const Comment = require("./commentModel");
 
 module.exports = {
   tokenBlacklistModel,
   User,
-  TennisClub,
+  Club,
+  Court,
+  Booking,
   Comment,
 };
