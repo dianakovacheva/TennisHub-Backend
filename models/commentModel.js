@@ -10,11 +10,13 @@ const commentSchema = new Schema(
     },
     commentAuthor: {
       type: Types.ObjectId,
+      required: true,
       ref: "User",
     },
-    commentedTennisClub: {
+    commentedClub: {
       type: Types.ObjectId,
-      ref: "TennisClub",
+      required: true,
+      ref: "Club",
     },
   },
   { timestamps: { createdAt: "created_at" } }
