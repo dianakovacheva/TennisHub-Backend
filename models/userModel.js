@@ -49,25 +49,28 @@ const userSchema = new Schema({
         `${props.value} must contain only latin letters and digits!`,
     },
   },
-  membershipStatus: String,
-  userRole: String,
-  isClubManager: false,
-  userCreatedClubsList: [
+  userCreatedClubs: [
     {
       type: [Types.ObjectId],
-      ref: "TennisClub",
+      ref: "Club",
     },
   ],
-  userCommentsList: [
+  userManagedClubs: [
     {
       type: [Types.ObjectId],
-      ref: "Comment",
+      ref: "Club",
     },
   ],
-  userJoinedTennisClubsList: [
+  userJoinedClubs: [
     {
       type: [Types.ObjectId],
-      ref: "TennisClub",
+      ref: "Club",
+    },
+  ],
+  userBookedCourts: [
+    {
+      type: [Types.ObjectId],
+      ref: "Court",
     },
   ],
 });
