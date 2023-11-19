@@ -59,7 +59,7 @@ const clubSchema = new Schema(
         ref: "User",
       },
     ],
-    clubComments: [
+    comments: [
       {
         type: [Types.ObjectId],
         ref: "Comment",
