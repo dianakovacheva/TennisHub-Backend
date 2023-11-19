@@ -6,10 +6,8 @@ const { commentController, clubController } = require("../controllers");
 router.get("/club/:clubId", clubController.getClubComments);
 router.post("/club/:clubId/add-comment", auth(), commentController.addComment);
 router.put("/:commentId/edit", auth(), commentController.editComment);
-router.delete(
-  "/club/:clubId/comment/:commentId/delete",
-  auth(),
-  commentController.deleteComment
-);
+router.delete("/:commentId/delete", auth(), commentController.deleteComment);
+router.get("/user/:userId", auth(), commentController.getUserComments);
+router.get("/", commentController.getAllComments);
 
 module.exports = router;
