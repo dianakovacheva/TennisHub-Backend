@@ -7,7 +7,7 @@ const comments = require("./comments");
 
 router.use("/user", user);
 router.use("/auth", auth);
-router.use("/clubs", club);
+router.use("/club", club);
 router.use("/booking", booking);
 router.use("/comments", comments);
 
