@@ -1,10 +1,10 @@
 const { User, Booking } = require("../models");
 
-let courtId;
-
+// Book court
 async function bookCourt(req, res) {
   try {
-    const { courtId, bookedBy, startTime, endTime, players } = req.body;
+    const { courtId, startTime, endTime, players } = req.body;
+    const { _id: userId } = req.user;
 
     // Check if the court is available for the specified time slot
     const isCourtAvailable = await isCourtAvailableForBooking(
@@ -22,7 +22,7 @@ async function bookCourt(req, res) {
     // Create a new booking
     const booking = new Booking({
       courtId,
-      bookedBy,
+      bookedBy: userId,
       startTime,
       endTime,
       players,
@@ -34,13 +34,13 @@ async function bookCourt(req, res) {
     res.json({ message: "Court booked successfully." });
 
     await User.updateOne(
-      { _id: bookedBy },
-      { $addToSet: { userBookedCourts: courtId } },
+      { _id: userId },
+      { $addToSet: { userBookings: booking._id } },
       { new: true }
     );
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: err.message });
   }
 }
 
@@ -60,18 +60,96 @@ async function isCourtAvailableForBooking(courtId, startTime, endTime) {
 
   return conflictingBookings.length === 0;
 }
+
+// Get all bookings
+function getAllBookings(req, res, next) {
+  Booking.find()
+    .then((foundBookings) => {
+      if (foundBookings) {
+        res.status(200).json(foundBookings);
+      } else {
+        res.status(401).json({ message: `Not allowed!` });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
+}
+
+// Get booking by id
+function getBookingById(req, res, next) {
+  const { bookingId } = req.params;
+
+  Booking.findById(bookingId)
+    .then((foundBooking) => {
+      if (foundBooking) {
+        res.status(200).json(foundBooking);
+      } else {
+        res.status(401).json({ message: `Not allowed!` });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
+}
+
+// User Bookings
+function getUserBookings(req, res, next) {
+  const { _id: userId } = req.user;
+
+  Booking.find({ players: { $in: userId } })
+    .then((foundBookings) => {
+      res.status(200).json(foundBookings);
+    })
+    .catch((err) => res.send(err));
+
+  // User.findById({ _id: userId }, { password: 0, __v: 0 })
+  //   .populate("userBookedCourts")
+  //   .then((foundUser) => {
+  //     res.status(200).json(foundUser.userBookedCourts);
+  //   })
+  //   .catch((err) => res.send(err));
+}
+
+// Edit Booking
+function editBooking(req, res) {
+  const { bookingId } = req.params;
+  const { _id: userId } = req.user;
+  const { courtId, startTime, endTime, players } = req.body;
+
+  Booking.findOneAndUpdate(
+    { _id: bookingId, players: { $in: userId } },
+    {
+      courtId: courtId,
+      startTime: startTime,
+      endTime: endTime,
+      players: players,
+    }
+  )
+    .then((updatedBooking) => {
+      if (updatedBooking) {
+        res.status(200).json(updatedBooking);
+      } else {
+        res.status(401).json({ message: `Not allowed!` });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
+}
+
 // Delete Booking
 function deleteBooking(req, res) {
   const { bookingId } = req.params;
   const { _id: userId } = req.user;
 
   Promise.all([
-    Booking.findOneAndDelete({ _id: bookingId }),
+    Booking.findOneAndDelete({ _id: bookingId, players: { $in: userId } }),
     User.findOneAndUpdate(
       { _id: userId },
       {
         $pull: {
-          userBookedCourts: courtId,
+          userBookings: bookingId,
         },
       },
       { new: true }
@@ -89,20 +167,12 @@ function deleteBooking(req, res) {
     });
 }
 
-// User Bookings
-// function getuserBookedCourts(req, res, next) {
-//   const { _id: userId } = req.user;
-
-//   User.findById({ _id: userId }, { password: 0, __v: 0 })
-//     .populate("userBookedCourts")
-//     .then((foundUser) => {
-//       res.status(200).json(foundUser.userBookedCourts);
-//     })
-//     .catch((err) => res.send(err));
-// }
-
 module.exports = {
   bookCourt,
+  getAllBookings,
+  getBookingById,
+  editBooking,
   deleteBooking,
   // getuserBookedCourts,
+  getUserBookings,
 };
