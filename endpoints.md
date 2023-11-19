@@ -12,6 +12,7 @@
 
 ```
 - /user/<user-id>
+- /user/<user-id>/edit
 - /user/<user-id>/clubs
 - /user/<user-id>/bookings
 ```
@@ -19,26 +20,50 @@
 ## clubs endpoints
 
 ```
-- /clubs/
-- /club/<club-id>/
-- /club/<club-id>/join/
-- /club/<club-id>/leave/
+- /club/create
+- /club/<club-id>
+- /club/<club-id>/edit
+- /club/<club-id>/delete
+- /club/<club-id>/join
+- /club/<club-id>/leave
+- /club/<club-id>/members
+- /club/
+```
 
-- /club/<club-id>/courts/
-- /club/<club-id>/courts/<court-id>/
+## courts endpoints
 
-- /club/<club-id>/members/
+```
+- /club/court/create
+- /club/court/<court-id>/edit
+- /club/court/<court-id>/delete
+- /club/<club-id>/court/<court-id>
+- /club/<club-id>/courts
 ```
 
 ## booking enpoints
 
 ```
-/bookings?court_id=<court-id>&date=<date>
-/booking/<booking-id>
+- /booking/book-court
+- /booking/<booking-id>
+- /booking/<booking-id>/edit
+- /booking/<booking-id>/delete
+- /bookings?court_id=<court-id>&date=<date>
+- /booking/
 ```
 
 ## comments endpoints
 
 ```
-/comments?club-id%user-id
+- /comments/club/<club-id>
+- /comments/club/<club-id>/add-comment
+- /comments/<comment-id>/edit
+- /comments/<comment-id>/delete
+- /comments/user/<user-id>
+- /comments/
+```
+
+## search endpoint
+
+```
+- /club/search
 ```
