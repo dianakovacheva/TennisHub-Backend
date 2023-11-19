@@ -67,10 +67,10 @@ const userSchema = new Schema({
       ref: "Club",
     },
   ],
-  userBookedCourts: [
+  userBookings: [
     {
       type: [Types.ObjectId],
-      ref: "Court",
+      ref: "Booking",
     },
   ],
 });
