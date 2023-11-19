@@ -20,12 +20,19 @@ const bookingSchema = new Schema(
       type: Date,
       required: true,
     },
-    players: [
-      {
-        type: [Types.ObjectId],
-        ref: "User",
+    players: {
+      type: [
+        {
+          type: Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+      ],
+      validate: {
+        validator: (array) => array.length >= 2 && array.length <= 4,
+        message: "The number of players must be between 2 and 4.",
       },
-    ],
+    },
   },
   { timestamps: { createdAt: "created_at" } }
 );
