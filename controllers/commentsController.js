@@ -1,4 +1,4 @@
-const { User, Club, Comment } = require("../models");
+const { Club, Comment } = require("../models");
 
 // Add Comment
 function addComment(req, res, next) {
@@ -16,7 +16,7 @@ function addComment(req, res, next) {
         return Promise.all([
           Club.findOneAndUpdate(
             { _id: clubId },
-            { $push: { clubComments: createdComment._id } },
+            { $push: { comments: createdComment._id } },
             { new: true }
           ),
           Comment.findOne({ _id: createdComment._id })
@@ -25,6 +25,21 @@ function addComment(req, res, next) {
         ]).then((result) => {
           res.status(200).json(result[1].comment);
         });
+      } else {
+        res.status(401).json({ message: `Not allowed!` });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+    });
+}
+
+// Get all comments
+function getAllComments(req, res, next) {
+  Comment.find()
+    .then((foundComments) => {
+      if (foundComments) {
+        res.status(200).json(foundComments);
       } else {
         res.status(401).json({ message: `Not allowed!` });
       }
@@ -66,7 +81,7 @@ function deleteComment(req, res, next) {
     Comment.findOneAndDelete({ _id: commentId }),
     Club.findOneAndUpdate(
       { _id: clubId },
-      { $pull: { clubComments: commentId } },
+      { $pull: { comments: commentId } },
       { new: true }
     ),
   ])
@@ -83,37 +98,42 @@ function deleteComment(req, res, next) {
 }
 
 // User Comments
-function getComments(req, res, next) {
-  const clubId = req.query.club_id;
-  const userId = req.query.user_id;
+function getUserComments(req, res, next) {
+  const { _id: userId } = req.user;
 
   // Validate either clubId or userId is provided
-  if (!clubId && !userId) {
-    return res
-      .status(400)
-      .json({ message: "Either Club ID or User ID is required." });
-  }
+  // if (!clubId && !userId) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "Either Club ID or User ID is required." });
+  // }
 
-  let query = {};
+  // let query = {};
 
-  if (clubId) {
-    query.commentedClub = clubId;
-  }
+  // if (clubId) {
+  //   query.commentedClub = clubId;
+  // }
 
-  if (userId) {
-    query.commentAuthor = userId;
-  }
+  // if (userId) {
+  //   query.commentAuthor = userId;
+  // }
 
-  Comment.find(query)
-    .then((foundComments) => {
-      res.status(200).json(foundComments);
+  Comment.findOne({ commentAuthor: { $in: userId } })
+    .then((foundUserComments) => {
+      if (!foundUserComments) {
+        res.status(401).json({ message: `No comments yet!` });
+      }
+      res.status(200).json(foundUserComments);
     })
-    .catch((err) => res.send(err));
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 }
 
 module.exports = {
   addComment,
+  getAllComments,
   editComment,
   deleteComment,
-  getComments,
+  getUserComments,
 };
