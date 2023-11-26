@@ -64,6 +64,7 @@ async function isCourtAvailableForBooking(courtId, startTime, endTime) {
 // Get all bookings
 function getAllBookings(req, res, next) {
   Booking.find()
+    .populate({ path: "players", select: "firstName lastName" })
     .then((foundBookings) => {
       if (foundBookings) {
         res.status(200).json(foundBookings);
