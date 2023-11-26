@@ -5,7 +5,7 @@ const { clubController, courtController } = require("../controllers");
 
 // Club Related Routes
 router.post("/create", auth(), clubController.createClub);
-router.get("/:clubId", auth(), clubController.getClubById);
+router.get("/:clubId", clubController.getClubById);
 router.put("/:clubId/edit", auth(), clubController.editClub);
 router.delete("/:clubId/delete", auth(), clubController.deleteClub);
 router.put("/:clubId/join", auth(), clubController.joinClub);
