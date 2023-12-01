@@ -133,14 +133,12 @@ function deleteClub(req, res) {
       },
       { new: true }
     ),
-    Comment.findOneAndDelete(
-      { commentedClub: clubId },
-      { $pull: { commentedClub: clubId } }
-    ),
+    Comment.deleteMany({ commentedClub: clubId }),
+    Court.deleteMany({ clubId }),
   ])
-    .then(([deletedOne, _]) => {
+    .then(([deletedOne, _, deletedComments, deletedCourts]) => {
       if (deletedOne) {
-        res.status(200).json(deletedOne);
+        res.status(200).json(deletedOne, deletedComments, deletedCourts);
       } else {
         res.status(401).json({ message: `Not allowed!` });
       }
