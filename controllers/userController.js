@@ -2,14 +2,15 @@ const { User } = require("../models");
 
 // User Info
 function getUserById(req, res, next) {
-  const { _id: userId } = req.user;
+  const { userId } = req.params;
 
   User.findOne({ _id: userId }, { password: 0, __v: 0 })
     .then((user) => {
       if (!user) {
         return res.status(404).json({ message: "User not found." });
       }
-      res.status(200).send(bsonToJson(user));
+      console.log(user);
+      res.status(200).send(user);
     })
     .catch((err) => res.send(err));
 }
