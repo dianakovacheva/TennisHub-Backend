@@ -200,16 +200,10 @@ async function leaveClub(req, res, next) {
 
     const isManager = club.manager.includes(userId);
 
-    if (!isManager) {
+    if (isManager) {
       return res
         .status(403)
-        .json({ message: "You are not a manager of this club." });
-    }
-
-    if (club.manager.length === 1) {
-      return res
-        .status(403)
-        .json({ message: "You are the only manager. Cannot leave the club." });
+        .json({ message: "You are a manager of this club." });
     }
 
     return Promise.all([
