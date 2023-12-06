@@ -85,7 +85,7 @@ function getClubById(req, res, next) {
 function editClub(req, res) {
   const { clubId } = req.params;
   const { _id: userId } = req.user;
-  const { name, imageURL, summary, address, phoneNumber, manager } = req.body;
+  const { name, imageURL, summary, address, phoneNumber } = req.body;
 
   let convertedImageUrl = imageURL;
   if (imageURL == "") {
@@ -100,7 +100,6 @@ function editClub(req, res) {
       summary: summary,
       address: address,
       phoneNumber: phoneNumber,
-      manager: manager,
     }
   )
     .then((updatedClub) => {
@@ -193,32 +192,59 @@ function joinClub(req, res, next) {
 }
 
 // Leave Club
-function leaveClub(req, res, next) {
+async function leaveClub(req, res, next) {
   const { clubId } = req.params;
   const { _id: userId } = req.user;
 
-  return Promise.all([
-    Club.updateOne(
-      { _id: clubId },
-      { $pull: { members: userId } },
-      { new: true }
-    ),
-    User.updateOne(
-      { _id: userId },
-      {
-        $pull: { userJoinedClubs: clubId },
-      },
-      { new: true }
-    ),
-  ])
-    .then(() => {
-      res
-        .status(200)
-        .json({ message: `User ${userId} left club ${clubId} successfully!` });
-    })
-    .catch((error) => {
-      res.status(500).json(error);
-    });
+  try {
+    const club = await Club.findById(clubId);
+
+    if (!club) {
+      return res.status(400).json({ message: "Club not found" });
+    }
+
+    const isManager = club.manager.includes(userId);
+
+    if (!isManager) {
+      return res
+        .status(403)
+        .json({ message: "You are not a manager of this club" });
+    }
+
+    if (club.manager.length === 1) {
+      return res
+        .status(403)
+        .json({ message: "You are the only manager. Cannot leave the club." });
+    }
+
+    await Promise.all([
+      Club.updateOne(
+        { _id: clubId },
+        { $pull: { members: userId } },
+        { new: true }
+      ),
+      User.updateOne(
+        { _id: userId },
+        {
+          $pull: { userJoinedClubs: clubId },
+        },
+        { new: true }
+      ),
+    ])
+      .then(() => {
+        res.status(200).json({
+          message: `User ${userId} left club ${clubId} successfully!`,
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        res
+          .status(500)
+          .json({ message: "An error occurred while leaving the club" });
+      });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // Get Club Members
