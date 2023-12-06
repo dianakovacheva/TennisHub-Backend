@@ -171,13 +171,8 @@ function joinClub(req, res, next) {
       { new: true }
     ),
   ])
-    .then(([joinedClub, returnedUser]) => {
+    .then(([joinedClub]) => {
       if (joinedClub) {
-        // if (joinedClub.members.includes(userId)) {
-        //   return res
-        //     .status(400)
-        //     .json({ message: "User is already a member of the club." });
-        // }
         res.status(200).json({
           message: "User joined the club successfully!",
           joinedClub,
@@ -200,7 +195,7 @@ async function leaveClub(req, res, next) {
     const club = await Club.findById(clubId);
 
     if (!club) {
-      return res.status(400).json({ message: "Club not found" });
+      return res.status(400).json({ message: "Club not found." });
     }
 
     const isManager = club.manager.includes(userId);
@@ -208,7 +203,7 @@ async function leaveClub(req, res, next) {
     if (!isManager) {
       return res
         .status(403)
-        .json({ message: "You are not a manager of this club" });
+        .json({ message: "You are not a manager of this club." });
     }
 
     if (club.manager.length === 1) {
@@ -217,7 +212,7 @@ async function leaveClub(req, res, next) {
         .json({ message: "You are the only manager. Cannot leave the club." });
     }
 
-    await Promise.all([
+    return Promise.all([
       Club.updateOne(
         { _id: clubId },
         { $pull: { members: userId } },
@@ -225,9 +220,7 @@ async function leaveClub(req, res, next) {
       ),
       User.updateOne(
         { _id: userId },
-        {
-          $pull: { userJoinedClubs: clubId },
-        },
+        { $pull: { userJoinedClubs: clubId } },
         { new: true }
       ),
     ])
@@ -240,7 +233,7 @@ async function leaveClub(req, res, next) {
         console.error(error);
         res
           .status(500)
-          .json({ message: "An error occurred while leaving the club" });
+          .json({ message: "An error occurred while leaving the club." });
       });
   } catch (error) {
     console.log(error);
