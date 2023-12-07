@@ -16,7 +16,11 @@ router.get("/", clubController.getAllClubs);
 // Court Related Routes
 router.post("/court/create", auth(), courtController.createCourt);
 router.put("/court/:courtId/edit", auth(), courtController.editCourt);
-router.delete("/court/:courtId/delete", auth(), courtController.deleteCourt);
+router.delete(
+  "/:clubId/court/:courtId/delete",
+  auth(),
+  courtController.deleteCourt
+);
 router.get("/:clubId/court/:courtId", auth(), clubController.getCourtById);
 router.get("/:clubId/courts", auth(), clubController.getClubCourts);
 

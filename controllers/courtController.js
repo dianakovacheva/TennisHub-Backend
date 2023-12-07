@@ -65,8 +65,8 @@ function editCourt(req, res) {
 
 // Delete court
 function deleteCourt(req, res) {
-  const { courtId } = req.params;
-  const { clubId } = req.body;
+  const { courtId, clubId } = req.params;
+  // const { clubId } = req.body;
 
   Promise.all([
     Court.findOneAndDelete({ _id: courtId }),
