@@ -85,7 +85,7 @@ function deleteComment(req, res, next) {
       { new: true }
     ),
   ])
-    .then(([deletedOne, _, __]) => {
+    .then(([deletedOne, _]) => {
       if (deletedOne) {
         res.status(200).json(deletedOne);
       } else {
