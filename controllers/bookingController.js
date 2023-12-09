@@ -120,9 +120,6 @@ function editBooking(req, res) {
   const { bookingId } = req.params;
   const { _id: userId } = req.user;
   const { courtId, startTime, endTime, players } = req.body;
-  console.log(bookingId);
-  console.log(userId);
-  console.log(req.body);
 
   Booking.findOneAndUpdate(
     { _id: bookingId, players: { $in: userId } },
