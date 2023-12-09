@@ -17,7 +17,7 @@ function getUserById(req, res, next) {
 
 // Edit User Info
 function editUserInfo(req, res, next) {
-  const { _id: userId } = req.user;
+  const { userId } = req.params;
   const { firstName, lastName, email } = req.body;
 
   User.findOneAndUpdate(
@@ -33,7 +33,7 @@ function editUserInfo(req, res, next) {
 
 // User Created Clubs
 function getUserCreatedClubs(req, res, next) {
-  const { _id: userId } = req.user;
+  const { userId } = req.params;
 
   User.findById({ _id: userId }, { password: 0, __v: 0 })
     .populate("userCreatedClubs")
@@ -48,7 +48,7 @@ function getUserCreatedClubs(req, res, next) {
 
 // User Managed Clubs
 function getUserManagedClubs(req, res, next) {
-  const { _id: userId } = req.user;
+  const { userId } = req.params;
 
   User.findById({ _id: userId }, { password: 0, __v: 0 })
     .populate("userManagedClubs")
@@ -63,12 +63,12 @@ function getUserManagedClubs(req, res, next) {
 
 // User Joined Clubs
 function getUserJoinedClubs(req, res, next) {
-  const { _id: userId } = req.user;
+  const { userId } = req.params;
 
   User.findById({ _id: userId }, { password: 0, __v: 0 })
-    .populate("userJoinedClubsList")
+    .populate("userJoinedClubs")
     .then((foundUser) => {
-      res.status(200).json(foundUser.userJoinedClubsList);
+      res.status(200).json(foundUser.userJoinedClubs);
     })
     .catch((err) => res.send(err));
 }

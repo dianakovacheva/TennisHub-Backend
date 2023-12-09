@@ -1,4 +1,4 @@
-const { Club, User, Comment, Court } = require("../models");
+const { Club, User, Comment, Court, Booking } = require("../models");
 
 // Create Club
 function createClub(req, res) {
@@ -134,14 +134,19 @@ function deleteClub(req, res) {
     ),
     Comment.deleteMany({ commentedClub: clubId }),
     Court.deleteMany({ clubId }),
+    Booking.deleteMany({ clubId }),
   ])
-    .then(([deletedOne, _, deletedComments, deletedCourts]) => {
-      if (deletedOne) {
-        res.status(200).json(deletedOne, deletedComments, deletedCourts);
-      } else {
-        res.status(401).json({ message: `Not allowed!` });
+    .then(
+      ([deletedOne, _, deletedComments, deletedCourts, deletedBookings]) => {
+        if (deletedOne) {
+          res
+            .status(200)
+            .json(deletedOne, deletedComments, deletedCourts, deletedBookings);
+        } else {
+          res.status(401).json({ message: `Not allowed!` });
+        }
       }
-    })
+    )
     .catch((error) => {
       res.status(500).json(error);
     });
@@ -239,12 +244,21 @@ function getClubMembers(req, res, next) {
   const clubId = req.params.clubId;
 
   Club.findById(clubId)
-    .populate("members")
+    .populate({
+      path: "members",
+      select: "firstName lastName",
+    })
     .then((foundClub) => {
       if (!foundClub) {
         return res.status(404).json({ message: "Club not found." });
       }
-      res.status(200).json(foundClub.members);
+      const members = foundClub.members.map((member) => ({
+        _id: member._id,
+        firstName: member.firstName,
+        lastName: member.lastName,
+        fullName: member.fullName,
+      }));
+      res.status(200).json(members);
     })
     .catch((error) => {
       res.status(500).json(error);

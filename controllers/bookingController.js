@@ -3,7 +3,7 @@ const { User, Booking } = require("../models");
 // Book court
 async function bookCourt(req, res) {
   try {
-    const { courtId, startTime, endTime, players } = req.body;
+    const { courtId, bookedBy, startTime, endTime, players } = req.body;
     const { _id: userId } = req.user;
 
     // Check if the court is available for the specified time slot
@@ -22,7 +22,7 @@ async function bookCourt(req, res) {
     // Create a new booking
     const booking = new Booking({
       courtId,
-      bookedBy: userId,
+      bookedBy,
       startTime,
       endTime,
       players,
@@ -40,7 +40,7 @@ async function bookCourt(req, res) {
     );
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
@@ -64,7 +64,10 @@ async function isCourtAvailableForBooking(courtId, startTime, endTime) {
 // Get all bookings
 function getAllBookings(req, res, next) {
   Booking.find()
-    .populate({ path: "players", select: "firstName lastName" })
+    .populate({
+      path: "players",
+      select: "firstName lastName fullName",
+    })
     .then((foundBookings) => {
       if (foundBookings) {
         res.status(200).json(foundBookings);
@@ -117,6 +120,9 @@ function editBooking(req, res) {
   const { bookingId } = req.params;
   const { _id: userId } = req.user;
   const { courtId, startTime, endTime, players } = req.body;
+  console.log(bookingId);
+  console.log(userId);
+  console.log(req.body);
 
   Booking.findOneAndUpdate(
     { _id: bookingId, players: { $in: userId } },
