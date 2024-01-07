@@ -1,4 +1,4 @@
-const { User, Booking } = require("../models");
+const { User, Booking, Club } = require("../models");
 
 // Book court
 async function bookCourt(req, res) {
@@ -46,9 +46,6 @@ async function bookCourt(req, res) {
 
 // Function to check if the court is available for booking
 async function isCourtAvailableForBooking(courtId, startTime, endTime) {
-  // Implement your logic to check if the court is available for the specified time slot
-  // For example, query the database to see if there are any conflicting bookings
-
   const conflictingBookings = await Booking.find({
     courtId: courtId,
     $or: [
@@ -68,6 +65,7 @@ function getAllBookings(req, res, next) {
       path: "players",
       select: "firstName lastName fullName",
     })
+
     .then((foundBookings) => {
       if (foundBookings) {
         res.status(200).json(foundBookings);
